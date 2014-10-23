@@ -16,9 +16,11 @@ spec = Gem::Specification.new do |s|
   s.rdoc_options << '--title' << 'skb' << '--main' << 'README.rdoc' << '-ri'
   s.bindir = 'bin'
   s.executables << 'skb'
+
   s.add_development_dependency('rake')
   s.add_development_dependency('rdoc')
   s.add_development_dependency('aruba')
+  s.add_development_dependency('rubocop')
 
   s.add_runtime_dependency('gli','2.12.2')
 end
