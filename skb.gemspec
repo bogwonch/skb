@@ -27,4 +27,5 @@ spec = Gem::Specification.new do |s|
   s.add_runtime_dependency 'rickshaw', '~> 0.2.0'
   s.add_runtime_dependency 'mime-types', '~> 2.4.0'
   s.add_runtime_dependency 'xdg', '~> 2.2.3'
+  s.add_runtime_dependency 'class_loader', '~> 3.0.0'
 end

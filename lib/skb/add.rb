@@ -1,3 +1,4 @@
+require 'skb/command'
 require 'skb'
 
 require 'rickshaw'

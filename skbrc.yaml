@@ -1,0 +1,3 @@
+config:
+  location: ./skb_store
+  metafetchers: ./metafetchers

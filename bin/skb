@@ -2,11 +2,12 @@
 require 'gli'
 require 'skb'
 require 'psych'
+require 'logger'
 
 # Config file settings
 config = Skb::Config.new
 
-# GLI Settings
+# Command suite Settings
 include GLI::App
 
 program_desc 'Command line interface to the App Guarden SBK'
@@ -26,7 +27,7 @@ default_value config.path
 flag [:c, :config]
 
 desc 'Adds an app to the SKB'
-arg_name 'APK files to add to the SKB'
+arg_name 'APK [APKs]'
 command :add do |c|
   c.action do |_global, _options, args|
     Skb::AddCommand.new(config, args).execute
@@ -49,11 +50,25 @@ command :run do |c|
   end
 end
 
-desc 'UNIMPLEMENTED'
-arg_name 'Describe arguments to fetch here'
+desc 'Fetch metadata about an app'
+arg_name <<-EOF
+  ID metadata
+EOF
 command :fetch do |c|
-  c.action do |_global, _options, _args|
-    puts 'fetch command ran'
+  c.desc 'List available metadata fetchers'
+  c.switch [:l, :list]
+
+  c.desc 'Which metadata to fetch'
+  c.flag [:k, :kind]
+
+
+  c.action do |_global, options, args|
+    if options[:list] then Metafetcher.constants.each {|mf| puts mf.to_s } end
+
+    metafetcher = Metafetcher.const_get options[:kind]
+    args.each do |arg|
+      metafetcher.new File.join(config.location, arg)
+    end
   end
 end
 
@@ -68,6 +83,11 @@ pre do |global, _command, _options, _args|
 
   unless Dir.exist? config.location
     fail "SBK hasn't been created at '#{config.location}'"
+  end
+
+  # Load metafetchers
+  Dir['./metafetchers/*.rb'].each do |f| 
+    require f
   end
 
   true
