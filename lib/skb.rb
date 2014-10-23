@@ -1,4 +1,5 @@
 require 'skb/version.rb'
-
-# Add requires for other files you add to your project here, so
-# you just need to require this one file in your bin file
+require 'skb/config.rb'
+require 'skb/command.rb'
+require 'skb/add.rb'
+require 'skb/apk.rb'

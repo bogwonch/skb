@@ -1,78 +1,79 @@
 #!/usr/bin/env ruby
 require 'gli'
 require 'skb'
+require 'psych'
 
+# Config file settings
+config = Skb::Config.new()
+
+# GLI Settings
 include GLI::App
 
-program_desc 'Describe your application here'
+program_desc 'Command line interface to the App Guarden SBK'
 
 version Skb::VERSION
 
 subcommand_option_handling :normal
 arguments :strict
 
-desc 'Describe some switch here'
-switch [:s,:switch]
+desc 'location of the SKB file store'
+arg_name 'DIR'
+flag [:l, :location]
 
-desc 'Describe some flag here'
-default_value 'the default'
-arg_name 'The name of the argument'
-flag [:f,:flagname]
+desc 'config file path'
+arg_name 'skbrc.yaml'
+default_value config.path
+flag [:c, :config]
 
-desc 'Describe add here'
-arg_name 'Describe arguments to add here'
+desc 'Adds an app to the SKB'
+arg_name 'APK files to add to the SKB'
 command :add do |c|
-  c.desc 'Describe a switch to add'
-  c.switch :s
-
-  c.desc 'Describe a flag to add'
-  c.default_value 'default'
-  c.flag :f
-  c.action do |global_options,options,args|
-
-    # Your command logic here
-     
-    # If you have any errors, just raise them
-    # raise "that command made no sense"
-
-    puts "add command ran"
+  c.action do |global_options, options, args|
+      Skb::AddCommand.new(config, args).execute
   end
 end
 
-desc 'Describe check here'
+desc 'UNIMPLEMENTED'
 arg_name 'Describe arguments to check here'
 command :check do |c|
-  c.action do |global_options,options,args|
+  c.action do |global_options, options, args|
     puts "check command ran"
   end
 end
 
-desc 'Describe run here'
+desc 'UNIMPLEMENTED'
 arg_name 'Describe arguments to run here'
 command :run do |c|
-  c.action do |global_options,options,args|
+  c.action do |global_options, options, args|
     puts "run command ran"
   end
 end
 
-desc 'Describe fetch here'
+desc 'UNIMPLEMENTED'
 arg_name 'Describe arguments to fetch here'
 command :fetch do |c|
-  c.action do |global_options,options,args|
+  c.action do |global_options, options, args|
     puts "fetch command ran"
   end
 end
 
-pre do |global,command,options,args|
+pre do |global, command, options, args|
   # Pre logic here
   # Return true to proceed; false to abort and not call the
   # chosen command
   # Use skips_pre before a command to skip this block
   # on that command only
+  config = Skb::Config.new(global[:config]) if global[:config]
+  config.config['location'] = global[:location] if global[:location]
+
+  unless Dir.exist? config.location then
+    raise RuntimeError, "SBK hasn't been created at '#{config.location}'"
+  end
+
   true
 end
 
-post do |global,command,options,args|
+post do |global, command, options, args|
   # Post logic here
   # Use skips_post before a command to skip this
   # block on that command only
@@ -81,6 +82,9 @@ end
 on_error do |exception|
   # Error logic here
   # return false to skip default error handling
+  exception.backtrace.each {|line| puts line}
+  puts config.path
+  puts config.config
   true
 end
 
