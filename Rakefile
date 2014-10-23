@@ -6,7 +6,10 @@ require 'cucumber'
 require 'cucumber/rake/task'
 require 'rubocop/rake_task'
 
-RuboCop::RakeTask.new
+desc "Run RuboCop on ruby files"
+RuboCop::RakeTask.new(:rubocop) do |task|
+  task.patterns = ['lib/**/*.rb', 'bin/*.rb']
+end
 
 Rake::RDocTask.new do |rd|
   rd.main = 'README.rdoc'
