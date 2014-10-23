@@ -1,0 +1,5 @@
+= skb
+
+Generate this with
+    skb rdoc
+After you have described your command line interface

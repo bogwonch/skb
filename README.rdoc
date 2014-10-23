@@ -1,0 +1,6 @@
+= skb
+
+Describe your project here
+
+:include:skb.rdoc
+
