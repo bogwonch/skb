@@ -4,7 +4,7 @@ require 'skb'
 require 'psych'
 
 # Config file settings
-config = Skb::Config.new()
+config = Skb::Config.new
 
 # GLI Settings
 include GLI::App
@@ -28,36 +28,36 @@ flag [:c, :config]
 desc 'Adds an app to the SKB'
 arg_name 'APK files to add to the SKB'
 command :add do |c|
-  c.action do |global_options, options, args|
-      Skb::AddCommand.new(config, args).execute
+  c.action do |_global, _options, args|
+    Skb::AddCommand.new(config, args).execute
   end
 end
 
 desc 'UNIMPLEMENTED'
 arg_name 'Describe arguments to check here'
 command :check do |c|
-  c.action do |global_options, options, args|
-    puts "check command ran"
+  c.action do |_global, _options, _args|
+    puts 'check command ran'
   end
 end
 
 desc 'UNIMPLEMENTED'
 arg_name 'Describe arguments to run here'
 command :run do |c|
-  c.action do |global_options, options, args|
-    puts "run command ran"
+  c.action do |_global, _options, _args|
+    puts 'run command ran'
   end
 end
 
 desc 'UNIMPLEMENTED'
 arg_name 'Describe arguments to fetch here'
 command :fetch do |c|
-  c.action do |global_options, options, args|
-    puts "fetch command ran"
+  c.action do |_global, _options, _args|
+    puts 'fetch command ran'
   end
 end
 
-pre do |global, command, options, args|
+pre do |global, _command, _options, _args|
   # Pre logic here
   # Return true to proceed; false to abort and not call the
   # chosen command
@@ -66,14 +66,14 @@ pre do |global, command, options, args|
   config = Skb::Config.new(global[:config]) if global[:config]
   config.config['location'] = global[:location] if global[:location]
 
-  unless Dir.exist? config.location then
-    raise RuntimeError, "SBK hasn't been created at '#{config.location}'"
+  unless Dir.exist? config.location
+    fail "SBK hasn't been created at '#{config.location}'"
   end
 
   true
 end
 
-post do |global, command, options, args|
+post do |_global, _command, _options, _args|
   # Post logic here
   # Use skips_post before a command to skip this
   # block on that command only
@@ -82,7 +82,7 @@ end
 on_error do |exception|
   # Error logic here
   # return false to skip default error handling
-  exception.backtrace.each {|line| puts line}
+  exception.backtrace.each { |line| puts line }
   puts config.path
   puts config.config
   true
