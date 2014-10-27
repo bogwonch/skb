@@ -42,17 +42,31 @@ command :check do |c|
   end
 end
 
-desc 'UNIMPLEMENTED'
-arg_name 'Describe arguments to run here'
+desc 'Run checking utilities on an app'
+arg_name 'ID' 
 command :run do |c|
-  c.action do |_global, _options, _args|
-    puts 'run command ran'
+  c.desc 'List available app checkers'
+  c.switch [:l, :list]
+
+  c.desc 'Which checker to run'
+  c.flag [:k, :kind]
+
+  c.action do |_global, options, args|
+    if options[:list] then ResultFetcher.constants.each {|mf| puts mf.to_s } end
+
+    unless options[:kind].nil?
+      fetcher = ResultFetcher.const_get options[:kind]
+      args.each do |arg|
+        fetched = fetcher.new File.join(config.location, arg)
+        puts fetched.to_s
+      end
+    end
   end
 end
 
 desc 'Fetch metadata about an app'
 arg_name <<-EOF
-  ID metadata
+  ID 
 EOF
 command :fetch do |c|
   c.desc 'List available metadata fetchers'
@@ -61,13 +75,15 @@ command :fetch do |c|
   c.desc 'Which metadata to fetch'
   c.flag [:k, :kind]
 
-
   c.action do |_global, options, args|
-    if options[:list] then Metafetcher.constants.each {|mf| puts mf.to_s } end
+    if options[:list] then MetaFetcher.constants.each {|mf| puts mf.to_s } end
 
-    metafetcher = Metafetcher.const_get options[:kind]
-    args.each do |arg|
-      metafetcher.new File.join(config.location, arg)
+    unless options[:kind].nil?
+      fetcher = MetaFetcher.const_get options[:kind]
+      args.each do |arg|
+        fetched = fetcher.new File.join(config.location, arg)
+        puts fetched.to_s
+      end
     end
   end
 end
@@ -87,6 +103,11 @@ pre do |global, _command, _options, _args|
 
   # Load metafetchers
   Dir['./metafetchers/*.rb'].each do |f| 
+    require f
+  end
+
+  # Load resultfetchers
+  Dir['./resultfetchers/*.rb'].each do |f|
     require f
   end
 
