@@ -1,3 +1,5 @@
+require 'ruby-filemagic'
+
 module Skb
   ##
   # APK objects represent Android APKs
@@ -56,6 +58,12 @@ module Skb
       fail ArgumentError, \
            "The file '#{@path} has the wrong MIME type: #{mime}" \
         unless mime == 'application/vnd.android.package-archive'
+
+      # Check the Magic type:  I suspect this will be fragile
+      ft = FileMagic.fm(:symlink).file(@path)
+      fail ArgumentError, "The file '#{@path}' doesn't seem to be an APK (#{ft})" \
+        unless ft == "Java archive data (JAR)"
+
     end
 
     ##
@@ -92,6 +100,8 @@ module Skb
            "The apk '#{apk}' collides with an existing" \
            "entry in the SKB with id: #{@id}" \
         unless same_as apks.first
+
+      return true
     end
   end
 end

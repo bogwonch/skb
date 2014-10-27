@@ -1,6 +1,5 @@
 require 'xdg'
 require 'yaml'
-require 'class_loader'
 
 module Skb
   ##
