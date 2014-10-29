@@ -75,6 +75,9 @@ command :fetch do |c|
   c.desc 'Which metadata to fetch'
   c.flag [:k, :kind]
 
+  c.desc 'Don\'t output results, just fetch the data'
+  c.flag [:q, :quiet]
+
   c.action do |_global, options, args|
     if options[:list] then MetaFetcher.constants.each {|mf| puts mf.to_s } end
 
@@ -82,7 +85,11 @@ command :fetch do |c|
       fetcher = MetaFetcher.const_get options[:kind]
       args.each do |arg|
         fetched = fetcher.new File.join(config.location, arg)
-        puts fetched.to_s
+
+        unless options[:quiet]
+          puts fetched.to_s 
+          puts ""
+        end
       end
     end
   end
