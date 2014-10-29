@@ -1,4 +1,6 @@
 require 'ruby-filemagic'
+require 'open3'
+require 'timeout'
 
 module Skb
   ##
@@ -9,7 +11,14 @@ module Skb
     def initialize(path)
       @path = path
       validate
+      
+      @badging = fetch_badging(path)
       @id = create_id
+    end
+
+    def package
+      matches = /^pacakge: name='(?<package>[^']+)'/.match @badging
+      return matches[:package] unless matches.nil?
     end
 
     ##
@@ -65,7 +74,6 @@ module Skb
         unless ft == 'Java archive data (JAR)' or \
                ft == 'Microsoft OOXML'         or \
                ft.start_with? 'Zip archive data'
-
     end
 
     ##
@@ -104,6 +112,25 @@ module Skb
         unless same_as apks.first
 
       return true
+    end
+
+    private
+
+    def fetch_badging(path)
+      begin
+        output = Timeout::timeout(1) do
+          Open3::popen2("aapt dump badging '#{path}'") do |_in, out, thread|
+            status = thread.value
+            until status.success? do end
+            return out.read
+          end
+        end
+      rescue Timeout::Error
+        fail Timeout::Error 'Timed out attempting to read badging info ' \
+                            "from '#{path}'"
+      end
+
+      return output
     end
   end
 end

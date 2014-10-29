@@ -10,9 +10,13 @@ module Skb
   class AddCommand < Skb::Command
     def execute
       @arguments.each do |argument|
-        apk = Skb::APK.new(argument)
-        apk.add @options.location, @log
-        @log.info "added #{apk.path} with id #{apk.id}"
+        begin
+          apk = Skb::APK.new(argument)
+          apk.add @options.location, @log
+          @log.info "added #{apk.path} with id #{apk.id}"
+        rescue Exception => e
+          @log.error "#{e.message}"
+        end
       end
     end
   end
