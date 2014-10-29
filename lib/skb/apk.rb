@@ -62,7 +62,9 @@ module Skb
       # Check the Magic type:  I suspect this will be fragile
       ft = FileMagic.fm(:symlink).file(@path)
       fail ArgumentError, "The file '#{@path}' doesn't seem to be an APK (#{ft})" \
-        unless ft == "Java archive data (JAR)"
+        unless ft == 'Java archive data (JAR)' or \
+               ft == 'Microsoft OOXML'         or \
+               ft.start_with? 'Zip archive data'
 
     end
 
