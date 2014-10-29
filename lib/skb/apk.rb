@@ -17,7 +17,7 @@ module Skb
     end
 
     def package
-      matches = /^pacakge: name='(?<package>[^']+)'/.match @badging
+      matches = /^package: name='(?<package>[^']+)'/.match @badging
       return matches[:package] unless matches.nil?
     end
 

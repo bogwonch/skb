@@ -28,4 +28,6 @@ spec = Gem::Specification.new do |s|
   s.add_runtime_dependency 'mime-types', '~> 2.4.0'
   s.add_runtime_dependency 'xdg', '~> 2.2.3'
   s.add_runtime_dependency 'ruby-filemagic', '~> 0.6.1'
+  s.add_runtime_dependency 'nokogiri', '~> 1.6.3.1'
+
 end
