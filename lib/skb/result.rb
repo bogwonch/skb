@@ -50,7 +50,8 @@ module Skb
     # Check the class has been named according to convention
     def check_name
       parts = name.split '_'
-      fail NotImplementedError \
+      fail NotImplementedError, \
+        "Result fetcher naming convention not being followed" \
         unless parts.length == 2 or parts.length == 3
     end
 
