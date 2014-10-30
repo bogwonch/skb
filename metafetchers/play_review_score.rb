@@ -5,7 +5,7 @@ require 'open-uri'
 module MetaFetcher
   ##
   # Gets the review score from the PlayStore
-  class PlayStoreReviewScore < Skb::MetadataFetcher
+  class PlayStoreReviewScore < Skb::MetaFetcher
     def execute
       begin
         doc = Nokogiri::HTML( \

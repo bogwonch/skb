@@ -94,6 +94,7 @@ command :fetch do |c|
             puts fetched.to_s 
             puts ""
           rescue => e
+            puts e.backtrace
             logger.error e.message
           end
         end
