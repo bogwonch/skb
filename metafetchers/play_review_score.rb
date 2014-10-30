@@ -13,8 +13,9 @@ module MetaFetcher
 
         score = doc.css('div.score').text
         out << "#{score.to_f}"
+        return true
       rescue Exception
-        out << "0.0"
+        return false
       end
     end
   end

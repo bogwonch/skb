@@ -7,6 +7,9 @@ require 'logger'
 # Config file settings
 config = Skb::Config.new
 
+# Logging
+logger = Logger.new(STDOUT)
+
 # Command suite Settings
 include GLI::App
 
@@ -87,8 +90,12 @@ command :fetch do |c|
         fetched = fetcher.new File.join(config.location, arg)
 
         unless options[:quiet]
-          puts fetched.to_s 
-          puts ""
+          begin
+            puts fetched.to_s 
+            puts ""
+          rescue => e
+            logger.error e.message
+          end
         end
       end
     end

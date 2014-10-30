@@ -1,4 +1,6 @@
 require 'skb'
+require 'tempfile'
+require 'timeout'
 
 module Skb
   ##
@@ -16,14 +18,24 @@ module Skb
 
         Dir.mkdir 'meta', 0744 unless Dir.exist? 'meta'
 
+        out = nil
         unless File.exist? @results_path
-          @out = File.open(@results_path, 'a+')
+          begin
+            @out = Tempfile.new class_name
 
-          # Run the Fetcher
-          # TODO: Drop privileges
-          execute
+            # Run the Fetcher
+            # TODO: Drop privileges
+            okay = Timeout::timeout(self.timeout()) { execute }
 
-          @out.close
+            if okay
+              out = File.open(@results_path, 'a+')
+              @out.rewind
+              out << @out.gets
+            end
+          ensure
+            @out.close unless @out.nil?
+            out.close unless out.nil?
+          end
         end
       end
 
@@ -33,6 +45,10 @@ module Skb
     def execute
       fail NotImplementedError,
            'attempted to call MetadataFetcher execute'
+    end
+
+    def timeout
+      nil
     end
 
     def to_s
