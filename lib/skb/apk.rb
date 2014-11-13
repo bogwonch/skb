@@ -73,7 +73,8 @@ module Skb
       fail ArgumentError, "The file '#{@path}' doesn't seem to be an APK (#{ft})" \
         unless ft == 'Java archive data (JAR)' or \
                ft == 'Microsoft OOXML'         or \
-               ft.start_with? 'Zip archive data'
+               ft.start_with? 'Zip archive data' or \
+               ft.start_with? 'Java Jar file data'
     end
 
     ##
