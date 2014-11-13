@@ -1,3 +1,3 @@
 config:
-  location: /srv/skb/store
+  location: /srv/skb/store/
   metafetchers: ./metafetchers
