@@ -14,11 +14,12 @@ module Skb
     ##
     # results/Tool/Version/Config/result
     def results_path
-      dir_path = File.expand_path File.join(@apk_dir, 'results', tool)
+      r_path = File.expand_path File.join(@apk_dir, 'results')
+      dir_path = File.expand_path File.join(r_path, tool)
       ver_path = File.expand_path File.join(dir_path, version)
       conf_path = File.expand_path File.join(ver_path, config)
-
-      Dir.mkdir 'results', 0744 unless Dir.exist? 'results'
+      
+      Dir.mkdir r_path, 0744 unless Dir.exist? r_path
       Dir.mkdir dir_path, 0740 unless Dir.exist? dir_path
       Dir.mkdir ver_path, 0740 unless Dir.exist? ver_path
       Dir.mkdir conf_path, 0740 unless Dir.exist? conf_path

@@ -32,7 +32,7 @@ module Skb
             if okay
               results = File.open results_path, 'a+'
               @out.rewind
-              results << @out.gets
+              results << @out.read
             end
           ensure
             @out.close unless @out.nil?
