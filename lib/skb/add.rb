@@ -14,7 +14,7 @@ module Skb
           apk = Skb::APK.new(argument)
           apk.add @options.location, @log
           @log.info "added #{apk.path} with id #{apk.id}"
-        rescue Exception => e
+        rescue => e
           @log.error "#{e.message}"
         end
       end

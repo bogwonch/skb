@@ -11,7 +11,7 @@ module Skb
     def initialize(path)
       @path = path
       validate
-      
+
       @badging = fetch_badging(path)
       @id = create_id
     end
@@ -133,4 +133,24 @@ module Skb
       return output
     end
   end
+
+
+  ##
+  # An entry in the SKB
+  class Entry
+    attr_reader :app, :meta
+    def initialize(id)
+      @id = id
+      @app = APK.new Dir[File.join(id, '*.apk')].first
+      @meta = Dir[File.join(id, 'meta', '*')].map {|m| File.basename m}
+    end
+
+    def fetch_meta(m)
+      fail IndexError, "No metadata about '#{m}'" \
+        unless @meta.include? m
+
+      File.open(File.join(@id, 'meta', m), 'r') { |f| return f.read }
+    end
+  end
 end
+

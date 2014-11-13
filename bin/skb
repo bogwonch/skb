@@ -3,6 +3,7 @@ require 'gli'
 require 'skb'
 require 'psych'
 require 'logger'
+require 'parallel'
 
 # Config file settings
 config = Skb::Config.new
@@ -54,14 +55,24 @@ command :run do |c|
   c.desc 'Which checker to run'
   c.flag [:k, :kind]
 
+  c.desc 'Run in parallel'
+  c.flag [:p, :parallel]
+
   c.action do |_global, options, args|
     if options[:list] then ResultFetcher.constants.each {|mf| puts mf.to_s } end
 
     unless options[:kind].nil?
       fetcher = ResultFetcher.const_get options[:kind]
-      args.each do |arg|
-        fetched = fetcher.new File.join(config.location, arg)
-        puts fetched.to_s
+      
+      if options[:parallel]
+        Parallel.map(args, progress: 'running') do |arg| 
+           fetcher.new File.join(config.location, arg)
+        end
+      else
+        args.each do |arg|
+          fetched = fetcher.new File.join(config.location, arg)
+          puts fetched.to_s
+        end
       end
     end
   end
@@ -100,6 +111,16 @@ command :fetch do |c|
         end
       end
     end
+  end
+end
+
+desc 'Dump the skb into a different format'
+arg_name <<-EOF
+  FORMAT
+EOF
+command :dump do |c|
+  c.action do |_global, _options, args| 
+    Skb::DumpSecPALCommand.new(config, args).execute
   end
 end
 
