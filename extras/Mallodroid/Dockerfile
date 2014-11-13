@@ -1,8 +1,6 @@
 FROM honeynet/androguard:latest
 MAINTAINER Joseph Hallett <josephhallett@gmail.com>
 
-WORKDIR /
-
 # Install mallodroid
 RUN git clone https://github.com/sfahl/mallodroid.git /usr/local/mallodroid
 RUN ln -s /usr/local/mallodroid/mallodroid.py /usr/local/bin
