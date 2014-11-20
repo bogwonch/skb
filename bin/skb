@@ -82,7 +82,9 @@ command :fetch do |c|
         end
       else
         args.each do |arg|
-          fetched = fetcher.new File.join(config.location, arg)
+          fetched = fetcher.new \
+            File.join(config.location, arg), 
+            overwrite: options[:overwrite] == true
 
           unless options[:quiet]
             begin

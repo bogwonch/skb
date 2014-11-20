@@ -19,7 +19,7 @@ module Skb
         @apk = APK.new find_apk_path
 
         results = nil
-        unless overwrite or File.exist? results_path
+        if overwrite or not File.exist? results_path
           begin
             # Temporary output file
             @out = Tempfile.new name
@@ -30,7 +30,7 @@ module Skb
 
             # If everything ran okay then copy the tempfile to the results file
             if okay
-              results = File.open results_path, 'w+'
+              results = File.open results_path, 'w'
               @out.rewind
               results << @out.read
             end
