@@ -8,18 +8,18 @@ module Skb
   class Fetcher
     attr_reader :apk, :out
 
-    def initialize(apk_dir, options=nil)
+    def initialize(apk_dir, options=nil, overwrite:false)
       @apk_dir = File.expand_path apk_dir
       @options=options
 
       # Forking so we can later drop privileges
-      pid = Process.fork do
+      _pid = Process.fork do
         Dir.chdir apk_dir # TODO: check path exists and chdir succeeds
 
         @apk = APK.new find_apk_path
 
         results = nil
-        unless File.exist? results_path
+        unless overwrite or File.exist? results_path
           begin
             # Temporary output file
             @out = Tempfile.new name
@@ -30,7 +30,7 @@ module Skb
 
             # If everything ran okay then copy the tempfile to the results file
             if okay
-              results = File.open results_path, 'a+'
+              results = File.open results_path, 'w+'
               @out.rewind
               results << @out.read
             end
