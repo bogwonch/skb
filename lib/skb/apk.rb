@@ -90,9 +90,6 @@ module Skb
         FileUtils.mkdir target, mode: 0700
         
         if @options[:symlink] 
-          log.warn "@path: #{@path}"
-          log.warn "@target: #{target}"
-
           FileUtils.ln_s @path, target
         else
           # TODO: Drop permissions and set correct UID
