@@ -33,8 +33,11 @@ flag [:c, :config]
 desc 'Adds an app to the SKB'
 arg_name 'APK [APKs]'
 command :add do |c|
-  c.action do |_global, _options, args|
-    Skb::AddCommand.new(config, args).execute
+  c.desc %q|Symlink the app rather than copying it into the database|
+  c.switch [:s, :symlink]
+
+  c.action do |_global, options, args|
+    Skb::AddCommand.new(config.config.merge(options), args).execute
   end
 end
 

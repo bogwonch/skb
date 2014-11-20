@@ -11,13 +11,15 @@ module Skb
     def execute
       @arguments.each do |argument|
         begin
-          apk = Skb::APK.new(argument)
-          apk.add @options.location, @log
+          apk = Skb::APK.new(argument, @options)
+          apk.add @options['location'], @log
           @log.info "added #{apk.path} with id #{apk.id}"
         rescue => e
           @log.error "#{e.message}"
+          puts e.backtrace
         end
       end
     end
   end
 end
+

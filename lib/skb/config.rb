@@ -30,7 +30,6 @@ module Skb
       @config['metafetchers'] || ''
     end
 
-
     ##
     # List available metafetchers
     #

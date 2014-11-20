@@ -8,8 +8,9 @@ module Skb
   class APK
     attr_reader :path, :id
 
-    def initialize(path)
-      @path = path
+    def initialize(path, options=Hash.new())
+      @path = File.expand_path path
+      @options = options
       validate
 
       @badging = fetch_badging(path)
@@ -71,9 +72,9 @@ module Skb
       # Check the Magic type:  I suspect this will be fragile
       ft = FileMagic.fm(:symlink).file(@path)
       fail ArgumentError, "The file '#{@path}' doesn't seem to be an APK (#{ft})" \
-        unless ft == 'Java archive data (JAR)' or \
-               ft == 'Microsoft OOXML'         or \
-               ft.start_with? 'Zip archive data' or \
+        unless ft == 'Java archive data (JAR)'     or \
+               ft == 'Microsoft OOXML'             or \
+               ft.start_with? 'Zip archive data'   or \
                ft.start_with? 'Java Jar file data'
     end
 
@@ -84,9 +85,19 @@ module Skb
       if already_exists target
         log.warn "APK '#{@path}' already exists... skipping"
       else
-        # TODO: Drop permissions and set correct UID
+        target = File.expand_path target
+
         FileUtils.mkdir target, mode: 0700
-        FileUtils.cp @path, target
+        
+        if @options[:symlink] 
+          log.warn "@path: #{@path}"
+          log.warn "@target: #{target}"
+
+          FileUtils.ln_s @path, target
+        else
+          # TODO: Drop permissions and set correct UID
+          FileUtils.cp @path, target
+        end
       end
     end
 
