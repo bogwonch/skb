@@ -72,6 +72,9 @@ command :fetch do |c|
   c.desc 'Run on all known apps rather than a specific one'
   c.switch [:a, :all]
 
+  c.desc 'Run in paralllel'
+  c.switch [:p, :parallel]
+
   c.action do |_global, options, args|
     if options[:metadata] then kind = MetaFetcher else kind = ResultFetcher end
     if options[:list] then kind.constants.each {|mf| puts mf.to_s } end
