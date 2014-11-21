@@ -10,8 +10,12 @@ module Skb
   class AddCommand < Skb::Command
     def execute
       @arguments.each do |argument|
-        if File.directory? argument then add_dir argument
-        else add_app argument end
+        if File.directory? argument 
+          apps = Dir[File.join(File.expand_path(argument), '*.apk')]
+          Parallel.map(apps, progress: 'adding') { |a| add_app a }
+        else 
+          add_app argument
+        end
       end
     end
 
