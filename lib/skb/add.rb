@@ -34,7 +34,7 @@ module Skb
         @log.info "added #{apk.path} with id #{apk.id}"
       rescue => e
         @log.error "#{e.message}"
-        puts e.backtrace
+        #puts e.backtrace
       end
     end
   end
