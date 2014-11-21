@@ -127,7 +127,7 @@ module Skb
 
     def fetch_badging(path)
       begin
-        output = Timeout::timeout(1) do
+        output = Timeout::timeout(5) do
           Open3::popen2("aapt dump badging '#{path}'") do |_in, out, thread|
             status = thread.value
             until status.success? do end
@@ -135,8 +135,8 @@ module Skb
           end
         end
       rescue Timeout::Error
-        fail Timeout::Error 'Timed out attempting to read badging info ' \
-                            "from '#{path}'"
+        fail Timeout::Error, 'Timed out attempting to read badging info ' \
+                             "from '#{path}'"
       end
 
       return output
