@@ -127,7 +127,7 @@ module Skb
 
     def fetch_badging(path)
       begin
-        output = Timeout::timeout(5) do
+        output = Timeout::timeout(30) do
           Open3::popen2("aapt dump badging '#{path}'") do |_in, out, thread|
             status = thread.value
             until status.success? do end
