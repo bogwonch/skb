@@ -24,8 +24,8 @@ module Skb
       end
     end
 
-    def skb_says app, has, fact
-      %Q|Skb says "#{app}" #{has}("#{fact}");\n|
+    def skb_says app, has, fact, who:'Skb'
+      %Q|#{who} says "#{app}" #{has}("#{fact}");\n|
     end
 
     private
@@ -46,7 +46,11 @@ module Skb
     end
 
     def meta_PlayStoreReviewScore(entity, data)
-      skb_says(entity.app.id, 'PlayStoreReviewScore', data.strip)
+      skb_says(entity.app.id, 'ReviewScore', data.strip, who:'PlayStore')
+    end
+
+    def meta_PlayStoreCategory(entity, data)
+      skb_says(entity.app.id, 'Category', data.strip, who:'PlayStore')
     end
   end
 end
