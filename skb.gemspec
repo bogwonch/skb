@@ -30,5 +30,6 @@ spec = Gem::Specification.new do |s|
   s.add_runtime_dependency 'ruby-filemagic', '~> 0.6.1'
   s.add_runtime_dependency 'nokogiri', '~> 1.6.3.1'
   s.add_runtime_dependency 'parallel', '~> 1.3.3'
+  s.add_runtime_dependency 'zip', '~> 2.0.2'
 
 end
