@@ -11,7 +11,7 @@ module ResultFetcher
     end
 
     def execute
-      @out.puts `mallodroid -f "#{@apk.path}"` 
+      @out.puts `mallodroid -x -f "#{@apk.path}"` 
       return true
     end
   end
