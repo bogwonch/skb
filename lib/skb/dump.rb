@@ -52,5 +52,22 @@ module Skb
     def meta_PlayStoreCategory(entity, data)
       skb_says(entity.app.id, 'Category', data.strip, who:'PlayStore')
     end
+
+    # This isn't a great dumping function.
+    # Should refactor to make statements about the certificate
+    # ...and split fields better
+    def meta_Certificate(entity, data)
+      out = ''
+      data.each_line do |line|
+        fields = line.split(': ')
+        unless fields.length != 2
+          key = fields[0].strip.gsub ' ', '_'
+          value = fields[1].strip.gsub '"', ''
+
+          out << skb_says(entity.app.id, "Certificate_#{key}", value)
+        end
+      end
+      return out
+    end
   end
 end
