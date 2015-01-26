@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='content-type' value='text/html;charset=utf8'>
+  <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
+  <title>skb(1) - get metadata from Android apps</title>
+  <style type='text/css' media='all'>
+  /* style: man */
+  body#manpage {margin:0}
+  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
+  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
+  .mp h2 {margin:10px 0 0 0}
+  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
+  .mp h3 {margin:0 0 0 4ex}
+  .mp dt {margin:0;clear:left}
+  .mp dt.flush {float:left;width:8ex}
+  .mp dd {margin:0 0 0 9ex}
+  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
+  .mp pre {margin-bottom:20px}
+  .mp pre+h2,.mp pre+h3 {margin-top:22px}
+  .mp h2+pre,.mp h3+pre {margin-top:5px}
+  .mp img {display:block;margin:auto}
+  .mp h1.man-title {display:none}
+  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  .mp h2 {font-size:16px;line-height:1.25}
+  .mp h1 {font-size:20px;line-height:2}
+  .mp {text-align:justify;background:#fff}
+  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
+  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
+  .mp u {text-decoration:underline}
+  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
+  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
+  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
+  .mp b.man-ref {font-weight:normal;color:#434241}
+  .mp pre {padding:0 4ex}
+  .mp pre code {font-weight:normal;color:#434241}
+  .mp h2+pre,h3+pre {padding-left:0}
+  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  ol.man-decor {width:100%}
+  ol.man-decor li.tl {text-align:left}
+  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
+  ol.man-decor li.tr {text-align:right;float:right}
+  </style>
+</head>
+<!--
+  The following styles are deprecated and will be removed at some point:
+  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
+
+  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
+  .man-navigation should be used instead.
+-->
+<body id='manpage'>
+  <div class='mp' id='man'>
+
+  <div class='man-navigation' style='display:none'>
+    <a href="#NAME">NAME</a>
+    <a href="#SYNOPSIS">SYNOPSIS</a>
+    <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#STORE-FORMAT">STORE FORMAT</a>
+    <a href="#ADDING-FETCHERS">ADDING FETCHERS</a>
+    <a href="#CONFIGURATION">CONFIGURATION</a>
+    <a href="#BUGS">BUGS</a>
+  </div>
+
+  <ol class='man-decor man-head man head'>
+    <li class='tl'>skb(1)</li>
+    <li class='tc'></li>
+    <li class='tr'>skb(1)</li>
+  </ol>
+
+  <h2 id="NAME">NAME</h2>
+<p class="man-name">
+  <code>skb</code> - <span class="man-whatis">get metadata from Android apps</span>
+</p>
+
+<h2 id="SYNOPSIS">SYNOPSIS</h2>
+
+<p><code>skb</code> [<code>-c</code>|<code>--config=</code> <var>config</var>] <var>command</var><br />
+<code>skb</code> help<br />
+<code>skb</code> <var>command</var> -h<br /></p>
+
+<p><code>skb</code> <var>options</var> <code>add</code> [<code>-s</code>|<code>--symlink</code>] APK [APKs...]<br />
+<code>skb</code> <var>options</var> <code>dump</code><br />
+<code>skb</code> <var>options</var> <code>fetch</code> [<code>-a</code>|<code>--all</code>] <code>-k</code>|<code>--kind=</code> <var>kind</var>
+                        [<code>-l</code>|<code>--list</code>] [<code>-m</code>|<code>--metadata</code>]
+                        [<code>--overwrite</code>] [<code>-p</code>|<code>--parallel</code>]
+                        [<code>-q</code>|<code>--quiet</code>] [<var>id</var>...]<br />
+<code>skb</code> help<br /></p>
+
+<h2 id="DESCRIPTION">DESCRIPTION</h2>
+
+<p><strong>The Security Knowledge Base</strong> is a database for storing running analysis
+tools and metadata fetchers on large sets of apps.  It is a command suite
+composed of three basic commands: <code>add</code>, <code>dump</code> and <code>fetch</code>.</p>
+
+<h3 id="add">add</h3>
+
+<p>The <code>add</code> command is used to one or more <var>APK</var> files into the database.  It can
+be passed either a number of files or a whole directory for addition into the
+database.</p>
+
+<p>If the <em>SKB</em> attempts to add something which isn't an Android APK then it
+<strong>should</strong> fail.  If you cannot add something that is a genuine app, please
+send a bug report.</p>
+
+<p>It has one option: <code>--symlink</code> which tells the <code>skb</code> not to copy the file into
+the database but rather create a symbolic link from another directory.  This is
+useful when the APKs are being kept in a central repository which you do not
+wish to duplicate.  For example on the <strong>App Guarden</strong> <strong>secpal-skb</strong> server
+APKs are stored in <code>/srv/skb/apks</code> in folders relating to where we got each
+one.  These are always symlinked into the <em>SKB</em> store, due to storage
+requirements.</p>
+
+<h3 id="dump">dump</h3>
+
+<p>The <code>dump</code> command outputs the contents of the <em>SKB</em> in <em>SecPAL</em> format.
+You probably want to pipe this output to a file.</p>
+
+<h3 id="fetch">fetch</h3>
+
+<p>The <code>fetch</code> command is used to get test results and metadata for apps.
+Optionally exisitng test results can be overwritten (<code>--overwrite</code>), or not
+shown (<code>--quiet</code>).</p>
+
+<p>Fetching makes a distinction between metadata fetching (<code>--metadata</code>) and
+analysis result fetching (<code>--no-metadata</code>: the default).  The distinction is
+that metadata about an app should be constant, whereas an analysis result may
+change within versions of the analysis tool.</p>
+
+<p>The <code>--list</code> option can be used to view what fetching utilities are available,
+and the <code>--kind</code> option is used to specify which one to use.  Fetching can be
+done in <code>--parallel</code>, however this breaks some fetchers relying on
+non-threadsafe external tools (<code>aapt</code> for example used to dump permissions and
+badging information).</p>
+
+<p>The fetch command can run on <code>--all</code> apps or just specific ones based on their
+<em>id</em>.</p>
+
+<h2 id="STORE-FORMAT">STORE FORMAT</h2>
+
+<p>Data is stored in the <em>store</em> directory.  Each app is given a folder based on a
+hash of the APK file it self.</p>
+
+<p>Inside each app directory the APK (or symbolic link to) the APK is found, plus
+two directories.  In <code>meta</code> metadata results are kept with each file giving one
+result from the fetcher of the same name.  In <code>results</code> folders exist for each
+different fetcher that has run on this app.  These are further split into
+version codes, and configurations in the subdirectories with the results  at
+the bottom.</p>
+
+<h2 id="ADDING-FETCHERS">ADDING FETCHERS</h2>
+
+<p>To add fetchers a Ruby script needs to be added to either the <code>metafetchers</code>
+(for metadata) or <code>resultfetchers</code> (for analysis tools) directories (note these will eventually move
+to a directory specified in the config file).</p>
+
+<h3 id="MetaFetchers">MetaFetchers</h3>
+
+<p>A minimal MetaFetcher is shown below.  It defines a fetcher called
+<code>FetcherName</code>.</p>
+
+<p>All MetaFetchers must define an <code>execute</code> method that should
+return a boolean indicating success or failure (in which case no output will be
+written).</p>
+
+<p>MetaFetchers have access to an <code>@out</code> stream where they should write their
+results to, and an <code>@apk</code> which points to the app to be analysed.</p>
+
+<pre><code>require 'skb'
+
+module MetaFetcher
+  class FetcherName &lt; Skb::MetaFetcher
+    def execute
+      @out.puts "Looking at #{@apk.path}"
+      @out.puts "This goes into the results file"
+      return true
+    end
+  end
+end
+</code></pre>
+
+<p>Optionally a <code>timeout</code> method can be defined that should return an integer
+indicating the maximum time the fetcher can run for before it should be killed
+and fail automatically.</p>
+
+<h3 id="ResultFetchers">ResultFetchers</h3>
+
+<p>A minimal ResultFetcher is shown below.  It defines a Fetcher called <code>Name</code>
+with version <code>Version</code>.</p>
+
+<pre><code>module ResultFetcher
+  class Name_Version &lt; Skb::ResultFetcher
+    def execute
+      @out.puts "output"
+      return true
+    end
+  end
+end
+</code></pre>
+
+<p>Optionally a configuration of a tool can be specified by adding a <code>_ConfigName</code>
+onto the class declaration. For example:</p>
+
+<pre><code>class Name_Version_Config &lt; Skb::ResultFetcher
+</code></pre>
+
+<p>Again a timeout can be specified in the same way by defining a <code>timeout</code>
+method.</p>
+
+<h2 id="CONFIGURATION">CONFIGURATION</h2>
+
+<p>The <code>skb</code> tool can be configured, somewhat, by a configuration file that should
+be placed in <code>~/.config/skbrc.yaml</code>.</p>
+
+<p>This YAML file defines the location of the store used by the <strong>SKB</strong>.
+Other configuration options will (eventually) be added.</p>
+
+<pre><code>config:
+  location: /srv/skb/store
+</code></pre>
+
+<h2 id="BUGS">BUGS</h2>
+
+<p>Probably many.  Send email to <a href="&#x6d;&#x61;&#105;&#108;&#116;&#x6f;&#x3a;&#74;&#46;&#72;&#97;&#108;&#x6c;&#x65;&#116;&#116;&#x40;&#x73;&#109;&#115;&#46;&#101;&#x64;&#46;&#x61;&#x63;&#x2e;&#x75;&#107;" data-bare-link="true">&#x4a;&#x2e;&#x48;&#97;&#x6c;&#108;&#x65;&#116;&#x74;&#x40;&#115;&#109;&#x73;&#46;&#x65;&#100;&#x2e;&#97;&#x63;&#46;&#117;&#x6b;</a> with a
+bug/feature/pull request and I'll get back to you.  Alternately poke me.</p>
+
+
+  <ol class='man-decor man-foot man foot'>
+    <li class='tl'></li>
+    <li class='tc'>January 2015</li>
+    <li class='tr'>skb(1)</li>
+  </ol>
+
+  </div>
+</body>
+</html>

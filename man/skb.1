@@ -1,0 +1,156 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "SKB" "1" "January 2015" "" ""
+.
+.SH "NAME"
+\fBskb\fR \- get metadata from Android apps
+.
+.SH "SYNOPSIS"
+\fBskb\fR [\fB\-c\fR|\fB\-\-config=\fR \fIconfig\fR] \fIcommand\fR
+.
+.br
+\fBskb\fR help
+.
+.br
+\fBskb\fR \fIcommand\fR \-h
+.
+.br
+.
+.P
+\fBskb\fR \fIoptions\fR \fBadd\fR [\fB\-s\fR|\fB\-\-symlink\fR] APK [APKs\.\.\.]
+.
+.br
+\fBskb\fR \fIoptions\fR \fBdump\fR
+.
+.br
+\fBskb\fR \fIoptions\fR \fBfetch\fR [\fB\-a\fR|\fB\-\-all\fR] \fB\-k\fR|\fB\-\-kind=\fR \fIkind\fR [\fB\-l\fR|\fB\-\-list\fR] [\fB\-m\fR|\fB\-\-metadata\fR] [\fB\-\-overwrite\fR] [\fB\-p\fR|\fB\-\-parallel\fR] [\fB\-q\fR|\fB\-\-quiet\fR] [\fIid\fR\.\.\.]
+.
+.br
+\fBskb\fR help
+.
+.br
+.
+.SH "DESCRIPTION"
+\fBThe Security Knowledge Base\fR is a database for storing running analysis tools and metadata fetchers on large sets of apps\. It is a command suite composed of three basic commands: \fBadd\fR, \fBdump\fR and \fBfetch\fR\.
+.
+.SS "add"
+The \fBadd\fR command is used to one or more \fIAPK\fR files into the database\. It can be passed either a number of files or a whole directory for addition into the database\.
+.
+.P
+If the \fISKB\fR attempts to add something which isn\'t an Android APK then it \fBshould\fR fail\. If you cannot add something that is a genuine app, please send a bug report\.
+.
+.P
+It has one option: \fB\-\-symlink\fR which tells the \fBskb\fR not to copy the file into the database but rather create a symbolic link from another directory\. This is useful when the APKs are being kept in a central repository which you do not wish to duplicate\. For example on the \fBApp Guarden\fR \fBsecpal\-skb\fR server APKs are stored in \fB/srv/skb/apks\fR in folders relating to where we got each one\. These are always symlinked into the \fISKB\fR store, due to storage requirements\.
+.
+.SS "dump"
+The \fBdump\fR command outputs the contents of the \fISKB\fR in \fISecPAL\fR format\. You probably want to pipe this output to a file\.
+.
+.SS "fetch"
+The \fBfetch\fR command is used to get test results and metadata for apps\. Optionally exisitng test results can be overwritten (\fB\-\-overwrite\fR), or not shown (\fB\-\-quiet\fR)\.
+.
+.P
+Fetching makes a distinction between metadata fetching (\fB\-\-metadata\fR) and analysis result fetching (\fB\-\-no\-metadata\fR: the default)\. The distinction is that metadata about an app should be constant, whereas an analysis result may change within versions of the analysis tool\.
+.
+.P
+The \fB\-\-list\fR option can be used to view what fetching utilities are available, and the \fB\-\-kind\fR option is used to specify which one to use\. Fetching can be done in \fB\-\-parallel\fR, however this breaks some fetchers relying on non\-threadsafe external tools (\fBaapt\fR for example used to dump permissions and badging information)\.
+.
+.P
+The fetch command can run on \fB\-\-all\fR apps or just specific ones based on their \fIid\fR\.
+.
+.SH "STORE FORMAT"
+Data is stored in the \fIstore\fR directory\. Each app is given a folder based on a hash of the APK file it self\.
+.
+.P
+Inside each app directory the APK (or symbolic link to) the APK is found, plus two directories\. In \fBmeta\fR metadata results are kept with each file giving one result from the fetcher of the same name\. In \fBresults\fR folders exist for each different fetcher that has run on this app\. These are further split into version codes, and configurations in the subdirectories with the results at the bottom\.
+.
+.SH "ADDING FETCHERS"
+To add fetchers a Ruby script needs to be added to either the \fBmetafetchers\fR (for metadata) or \fBresultfetchers\fR (for analysis tools) directories (note these will eventually move to a directory specified in the config file)\.
+.
+.SS "MetaFetchers"
+A minimal MetaFetcher is shown below\. It defines a fetcher called \fBFetcherName\fR\.
+.
+.P
+All MetaFetchers must define an \fBexecute\fR method that should return a boolean indicating success or failure (in which case no output will be written)\.
+.
+.P
+MetaFetchers have access to an \fB@out\fR stream where they should write their results to, and an \fB@apk\fR which points to the app to be analysed\.
+.
+.IP "" 4
+.
+.nf
+
+require \'skb\'
+
+module MetaFetcher
+  class FetcherName < Skb::MetaFetcher
+    def execute
+      @out\.puts "Looking at #{@apk\.path}"
+      @out\.puts "This goes into the results file"
+      return true
+    end
+  end
+end
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Optionally a \fBtimeout\fR method can be defined that should return an integer indicating the maximum time the fetcher can run for before it should be killed and fail automatically\.
+.
+.SS "ResultFetchers"
+A minimal ResultFetcher is shown below\. It defines a Fetcher called \fBName\fR with version \fBVersion\fR\.
+.
+.IP "" 4
+.
+.nf
+
+module ResultFetcher
+  class Name_Version < Skb::ResultFetcher
+    def execute
+      @out\.puts "output"
+      return true
+    end
+  end
+end
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Optionally a configuration of a tool can be specified by adding a \fB_ConfigName\fR onto the class declaration\. For example:
+.
+.IP "" 4
+.
+.nf
+
+class Name_Version_Config < Skb::ResultFetcher
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Again a timeout can be specified in the same way by defining a \fBtimeout\fR method\.
+.
+.SH "CONFIGURATION"
+The \fBskb\fR tool can be configured, somewhat, by a configuration file that should be placed in \fB~/\.config/skbrc\.yaml\fR\.
+.
+.P
+This YAML file defines the location of the store used by the \fBSKB\fR\. Other configuration options will (eventually) be added\.
+.
+.IP "" 4
+.
+.nf
+
+config:
+  location: /srv/skb/store
+.
+.fi
+.
+.IP "" 0
+.
+.SH "BUGS"
+Probably many\. Send email to \fIJ\.Hallett@sms\.ed\.ac\.uk\fR with a bug/feature/pull request and I\'ll get back to you\. Alternately poke me\.

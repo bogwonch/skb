@@ -1,0 +1,178 @@
+<!-- vim: set ft=markdown nowrap tw=0: -->
+
+skb(1) -- get metadata from Android apps
+========================================
+
+## SYNOPSIS
+
+`skb` [`-c`|`--config=` <config>] <command><br>
+`skb` help<br>
+`skb` <command> -h<br>
+
+`skb` <options> `add` [`-s`|`--symlink`] APK [APKs...]<br>
+`skb` <options> `dump`<br>
+`skb` <options> `fetch` [`-a`|`--all`] `-k`|`--kind=` <kind> 
+                        [`-l`|`--list`] [`-m`|`--metadata`]
+                        [`--overwrite`] [`-p`|`--parallel`] 
+                        [`-q`|`--quiet`] [<id>...]<br>
+`skb` help<br>
+
+## DESCRIPTION
+
+**The Security Knowledge Base** is a database for storing running analysis
+tools and metadata fetchers on large sets of apps.  It is a command suite
+composed of three basic commands: `add`, `dump` and `fetch`.
+
+
+### add
+
+The `add` command is used to one or more <APK> files into the database.  It can
+be passed either a number of files or a whole directory for addition into the
+database.
+
+If the _SKB_ attempts to add something which isn't an Android APK then it
+**should** fail.  If you cannot add something that is a genuine app, please
+send a bug report.
+
+It has one option: `--symlink` which tells the `skb` not to copy the file into
+the database but rather create a symbolic link from another directory.  This is
+useful when the APKs are being kept in a central repository which you do not
+wish to duplicate.  For example on the **App Guarden** **secpal-skb** server
+APKs are stored in `/srv/skb/apks` in folders relating to where we got each
+one.  These are always symlinked into the _SKB_ store, due to storage
+requirements.
+
+### dump
+
+The `dump` command outputs the contents of the _SKB_ in _SecPAL_ format.
+You probably want to pipe this output to a file.
+
+### fetch
+
+The `fetch` command is used to get test results and metadata for apps.
+Optionally exisitng test results can be overwritten (`--overwrite`), or not
+shown (`--quiet`).
+
+Fetching makes a distinction between metadata fetching (`--metadata`) and
+analysis result fetching (`--no-metadata`: the default).  The distinction is
+that metadata about an app should be constant, whereas an analysis result may
+change within versions of the analysis tool.
+
+The `--list` option can be used to view what fetching utilities are available,
+and the `--kind` option is used to specify which one to use.  Fetching can be
+done in `--parallel`, however this breaks some fetchers relying on
+non-threadsafe external tools (`aapt` for example used to dump permissions and
+badging information).
+
+The fetch command can run on `--all` apps or just specific ones based on their
+*id*.
+
+## STORE FORMAT
+
+Data is stored in the _store_ directory.  Each app is given a folder based on a
+hash of the APK file it self. 
+
+Inside each app directory the APK (or symbolic link to) the APK is found, plus
+two directories.  In `meta` metadata results are kept with each file giving one
+result from the fetcher of the same name.  In `results` folders exist for each
+different fetcher that has run on this app.  These are further split into
+version codes, and configurations in the subdirectories with the results  at
+the bottom.
+
+
+## ADDING FETCHERS
+
+To add fetchers a Ruby script needs to be added to either the `metafetchers`
+(for metadata) or `resultfetchers` (for analysis tools) directories (note these will eventually move
+to a directory specified in the config file).
+
+### MetaFetchers
+
+A minimal MetaFetcher is shown below.  It defines a fetcher called
+`FetcherName`. 
+
+All MetaFetchers must define an `execute` method that should
+return a boolean indicating success or failure (in which case no output will be
+written).  
+
+MetaFetchers have access to an `@out` stream where they should write their
+results to, and an `@apk` which points to the app to be analysed.
+
+    require 'skb'
+
+    module MetaFetcher
+      class FetcherName < Skb::MetaFetcher
+        def execute
+          @out.puts "Looking at #{@apk.path}"
+          @out.puts "This goes into the results file"
+          return true
+        end
+      end
+    end
+
+Optionally a `timeout` method can be defined that should return an integer
+indicating the maximum time the fetcher can run for before it should be killed
+and fail automatically.
+
+### ResultFetchers
+
+A minimal ResultFetcher is shown below.  It defines a Fetcher called `Name`
+with version `Version`.
+
+    module ResultFetcher
+      class Name_Version < Skb::ResultFetcher
+        def execute
+          @out.puts "output"
+          return true
+        end
+      end
+    end
+
+Optionally a configuration of a tool can be specified by adding a `_ConfigName`
+onto the class declaration. For example:
+
+    class Name_Version_Config < Skb::ResultFetcher
+
+Again a timeout can be specified in the same way by defining a `timeout`
+method.
+
+
+## CONFIGURATION
+
+The `skb` tool can be configured, somewhat, by a configuration file that should
+be placed in `~/.config/skbrc.yaml`.  Alternately the location of this file can
+be specified using the `-c` option to `skb`.
+
+This YAML file defines the location of the store used by the **SKB**.
+Other configuration options will (eventually) be added.
+
+    config:
+      location: /srv/skb/store
+
+
+## DEVELOPMENT
+
+This tool is developed using [Bundler](http://bundler.io).  This lets us keep
+track of the dependencies and generate Gems to be installed anywhere. 
+
+When running the development version first install all the dependencies using:
+
+    bundle install
+
+Then run the `skb` program using:
+
+    bundle exec skb ...
+
+If you want to create a gem that can be installed anywhere run:
+
+    rake gem
+
+Bare in mind I'm not running it installed anywhere yet though. Development only
+til 1.0!
+
+
+## BUGS
+
+Probably many.  Send email to <mailto:J.Hallett@sms.ed.ac.uk> with a
+bug/feature/pull request and I'll get back to you.  Alternately poke me.
+
