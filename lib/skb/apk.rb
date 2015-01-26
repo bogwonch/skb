@@ -147,19 +147,60 @@ module Skb
   ##
   # An entry in the SKB
   class Entry
-    attr_reader :app, :meta
+    attr_reader :app, :meta, :result
     def initialize(id)
       @id = id
       @app = APK.new Dir[File.join(id, '*.apk')].first
       @meta = Dir[File.join(id, 'meta', '*')].map {|m| File.basename m}
+      
+      @rs = Dir[File.join(id, 'results', '*')].map {|r| File.basename r}
+      puts "@ #{@rs}"
+      @rvs = []
+      @rs.each do |r|
+        fetch_result_versions(r).each {|rv| @rvs << rv}
+      end
+      @result = []
+      @rvs.each do |rv|
+        r,v = rv
+        fetch_result_version_configs(r,v).each {|rvc| @result << rvc} 
+      end
     end
 
+    ##
+    # Fetch the metadata
     def fetch_meta(m)
       fail IndexError, "No metadata about '#{m}'" \
         unless @meta.include? m
 
       File.open(File.join(@id, 'meta', m), 'r') { |f| return f.read }
     end
+
+    ##
+    # Fetch the result
+    def fetch_result(rvc)
+      r,v,c = rvc
+      fail IndexError, "No result for '#{r} v#{v} (#{c})'" \
+        unless @result.include? rvc
+
+      File.open(File.join(@id, 'results', r, v, c, 'result'), 'r') { |f| return f.read }
+    end
+
+    private
+
+    def fetch_result_versions(r)
+      fail IndexError, "No result for '#{r}'" \
+        unless @rs.include? r
+
+      Dir[File.join(@id, 'results', r, '*')].map {|v| [r, File.basename(v)]}  
+    end
+
+    def fetch_result_version_configs(r,v)
+      fail IndexError "No result for '#{r} v#{v}'" \
+        unless @rvs.include? [r,v]
+
+      Dir[File.join(@id, 'results', r, v, '*')].map {|c| [r,v,File.basename(c)]}
+    end
+
   end
 end
 

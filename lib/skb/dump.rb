@@ -13,13 +13,21 @@ module Skb
 
         e.meta.each do |meta|
           data = e.fetch_meta meta
-
           begin
             puts self.method("meta_#{meta}").call e, data
           rescue NameError
             @log.warn "cannot dump meta/#{meta}"
           end
-          
+        end
+
+        e.result.each do |result|
+          r,v,c = result
+          data = e.fetch_result result
+          begin
+            puts self.method("result_#{r}").call e, data
+          rescue NameError
+            @log.warn "cannot dump result/#{r}/#{v}/#{c}"
+          end
         end
       end
     end
