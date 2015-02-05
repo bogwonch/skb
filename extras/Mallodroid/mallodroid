@@ -73,7 +73,7 @@ trap 'on_die' SIGTERM SIGINT
 cp "$FILE" "$TEMPDIR/$APP"
 
 # Run Mallodroid in Docker
-docker run \
+echo docker run \
   --rm=true \
   -v "$TEMPDIR:/mnt" \
   "$CONTAINER" \

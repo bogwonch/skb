@@ -136,7 +136,7 @@ class Name_Version_Config < Skb::ResultFetcher
 Again a timeout can be specified in the same way by defining a \fBtimeout\fR method\.
 .
 .SH "CONFIGURATION"
-The \fBskb\fR tool can be configured, somewhat, by a configuration file that should be placed in \fB~/\.config/skbrc\.yaml\fR\.
+The \fBskb\fR tool can be configured, somewhat, by a configuration file that should be placed in \fB~/\.config/skbrc\.yaml\fR\. Alternately the location of this file can be specified using the \fB\-c\fR option to \fBskb\fR\.
 .
 .P
 This YAML file defines the location of the store used by the \fBSKB\fR\. Other configuration options will (eventually) be added\.
@@ -151,6 +151,51 @@ config:
 .fi
 .
 .IP "" 0
+.
+.SH "DEVELOPMENT"
+This tool is developed using Bundler \fIhttp://bundler\.io\fR\. This lets us keep track of the dependencies and generate Gems to be installed anywhere\.
+.
+.P
+When running the development version first install all the dependencies using:
+.
+.IP "" 4
+.
+.nf
+
+bundle install
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Then run the \fBskb\fR program using:
+.
+.IP "" 4
+.
+.nf
+
+bundle exec skb \.\.\.
+.
+.fi
+.
+.IP "" 0
+.
+.P
+If you want to create a gem that can be installed anywhere run:
+.
+.IP "" 4
+.
+.nf
+
+rake gem
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Bare in mind I\'m not running it installed anywhere yet though\. Development only til 1\.0!
 .
 .SH "BUGS"
 Probably many\. Send email to \fIJ\.Hallett@sms\.ed\.ac\.uk\fR with a bug/feature/pull request and I\'ll get back to you\. Alternately poke me\.

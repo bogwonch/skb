@@ -15,8 +15,7 @@ module Skb
       Dir.mkdir dir, 0744 \
         unless Dir.exist? dir
 
-      return File.expand_path path
+      File.expand_path path
     end
   end
 end
-

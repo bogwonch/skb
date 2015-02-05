@@ -6,7 +6,7 @@ module Skb
   #
   # FetcherName_VersionNumber_ConfigName
   class ResultFetcher < Fetcher
-    def initialize(apk_dir, options=nil)
+    def initialize(apk_dir, options = nil)
       check_name
       super apk_dir, options
     end
@@ -18,13 +18,13 @@ module Skb
       dir_path = File.expand_path File.join(r_path, tool)
       ver_path = File.expand_path File.join(dir_path, version)
       conf_path = File.expand_path File.join(ver_path, config)
-      
+
       Dir.mkdir r_path, 0744 unless Dir.exist? r_path
       Dir.mkdir dir_path, 0740 unless Dir.exist? dir_path
       Dir.mkdir ver_path, 0740 unless Dir.exist? ver_path
       Dir.mkdir conf_path, 0740 unless Dir.exist? conf_path
 
-      File.expand_path File.join(conf_path, "result")
+      File.expand_path File.join(conf_path, 'result')
     end
 
     private
@@ -34,7 +34,7 @@ module Skb
     def tool
       name.split('_')[0]
     end
-    
+
     ##
     # Version of tool being run
     def version
@@ -44,7 +44,7 @@ module Skb
     ##
     # Configuration name of tool, else default
     def config
-      return name.split('_')[2] || 'default'
+      name.split('_')[2] || 'default'
     end
 
     ##
@@ -52,9 +52,8 @@ module Skb
     def check_name
       parts = name.split '_'
       fail NotImplementedError, \
-        "Result fetcher naming convention not being followed" \
-        unless parts.length == 2 or parts.length == 3
+           'Result fetcher naming convention not being followed' \
+        unless parts.length == 2 || parts.length == 3
     end
-
   end
 end

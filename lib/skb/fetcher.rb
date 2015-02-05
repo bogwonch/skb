@@ -8,9 +8,9 @@ module Skb
   class Fetcher
     attr_reader :apk, :out
 
-    def initialize(apk_dir, options=nil, overwrite:false)
+    def initialize(apk_dir, options = nil, overwrite: false)
       @apk_dir = File.expand_path apk_dir
-      @options=options
+      @options = options
 
       # Forking so we can later drop privileges
       _pid = Process.fork do
@@ -19,14 +19,14 @@ module Skb
         @apk = APK.new find_apk_path
 
         results = nil
-        if overwrite or not File.exist? results_path
+        if overwrite || !(File.exist? results_path)
           begin
             # Temporary output file
             @out = Tempfile.new name
 
-            # Run the fetcher 
+            # Run the fetcher
             # TODO: drop privileges
-            okay = Timeout::timeout(timeout()) { execute }
+            okay = Timeout::timeout(timeout) { execute }
 
             # If everything ran okay then copy the tempfile to the results file
             if okay
@@ -76,7 +76,6 @@ module Skb
     # Locate the APK the fetcer needs to use
     def find_apk_path
       apks = Dir['*.apk']
-      
       fail "wrong number of APKs in #{apk_dir}: " \
            "#{apks.length} instead of 1" \
         unless apks.length == 1
@@ -87,17 +86,16 @@ module Skb
     ##
     # Convert the fetcher to a string. Typically the results
     def to_s
-      raise "No results for '#{self.class.name.split('::').last}'" \
+      fail "No results for '#{self.class.name.split('::').last}'" \
         unless File.exist? results_path
 
-      out = ""
+      out = ''
       File.open(results_path, 'r') do |f|
         while (line = f.gets)
           out << line
         end
       end
-      
-      return out
+      out
     end
   end
 end

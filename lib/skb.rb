@@ -7,4 +7,3 @@ require 'skb/fetcher.rb'
 require 'skb/metadata.rb'
 require 'skb/result.rb'
 require 'skb/version.rb'
-

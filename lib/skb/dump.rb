@@ -6,7 +6,7 @@ module Skb
   # Implements the command used to dump the SKB into SecPAL
   class DumpSecPALCommand < Skb::Command
     def execute
-      apps = Dir[File.join(@options.location, '*')] 
+      apps = Dir[File.join(@options.location, '*')]
       apps.each do |app|
         e = Entry.new(app)
         @log.info "dumping #{e.app.id}"
@@ -14,17 +14,17 @@ module Skb
         e.meta.each do |meta|
           data = e.fetch_meta meta
           begin
-            puts self.method("meta_#{meta}").call e, data
+            puts method("meta_#{meta}").call e, data
           rescue NameError
             @log.warn "cannot dump meta/#{meta}"
           end
         end
 
         e.result.each do |result|
-          r,v,c = result
+          r, v, c = result
           data = e.fetch_result result
           begin
-            puts self.method("result_#{r}").call e, data
+            puts method("result_#{r}").call e, data
           rescue NameError
             @log.warn "cannot dump result/#{r}/#{v}/#{c}"
           end
@@ -32,8 +32,8 @@ module Skb
       end
     end
 
-    def skb_says app, has, fact, who:'Skb'
-      %Q|#{who} says "#{app}" #{has}("#{fact}");\n|
+    def skb_says(app, has, fact, who: 'Skb')
+      %|#{who} says "#{app}" #{has}("#{fact}");\n|
     end
 
     private
@@ -50,15 +50,15 @@ module Skb
           output << skb_says(entity.app.id, 'Permission', perm)
         end
       end
-      return output
+      output
     end
 
     def meta_PlayStoreReviewScore(entity, data)
-      skb_says(entity.app.id, 'ReviewScore', data.strip, who:'PlayStore')
+      skb_says(entity.app.id, 'ReviewScore', data.strip, who: 'PlayStore')
     end
 
     def meta_PlayStoreCategory(entity, data)
-      skb_says(entity.app.id, 'Category', data.strip, who:'PlayStore')
+      skb_says(entity.app.id, 'Category', data.strip, who: 'PlayStore')
     end
 
     # This isn't a great dumping function.
@@ -75,7 +75,7 @@ module Skb
           out << skb_says(entity.app.id, "Certificate_#{key}", value)
         end
       end
-      return out
+      out
     end
   end
 end

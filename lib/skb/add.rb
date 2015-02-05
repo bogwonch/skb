@@ -11,14 +11,15 @@ module Skb
     def execute
       @arguments.each do |argument|
         if File.directory? argument then add_dir argument
-        else add_app argument end
+        else add_app argument
+        end
       end
     end
 
     ##
     # Add a directory of apps to the SKB
     def add_dir(argument)
-      Dir[File.join(argument, "*.apk")].each { |app| self.add_app app }
+      Dir[File.join(argument, '*.apk')].each { |app| add_app app }
     end
 
     ##
@@ -30,9 +31,8 @@ module Skb
         @log.info "added #{apk.path} with id #{apk.id}"
       rescue => e
         @log.error "#{e.message}"
-        #puts e.backtrace
+        # puts e.backtrace
       end
     end
   end
 end
-

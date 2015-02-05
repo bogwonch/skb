@@ -8,7 +8,7 @@ module Skb
   class APK
     attr_reader :path, :id
 
-    def initialize(path, options=Hash.new())
+    def initialize(path, options = {})
       @path = File.expand_path path
       @options = options
       validate
@@ -56,26 +56,27 @@ module Skb
     # Checks that +apk+ exists, isn't a directory and has the correct MIME
     # type.
     #
-    # An ArgumentError is raised if +apk+ doesn't appear to be valid.
+    # An ArgumentError is faild if +apk+ doesn't appear to be valid.
     def validate
-      fail ArgumentError, "The file '#{@path}' does not exist" \
+      fail ArgumentError, "The file '#{ @path }' does not exist" \
         unless File.exist? @path
 
-      fail ArgumentError, "The file '#{@path}' is a directory" \
+      fail ArgumentError, "The file '#{ @path }' is a directory" \
         if File.directory? @path
 
       mime = MIME::Types.of(@path).first.simplified
       fail ArgumentError, \
-           "The file '#{@path} has the wrong MIME type: #{mime}" \
+           "The file '#{ @path } has the wrong MIME type: #{ mime }" \
         unless mime == 'application/vnd.android.package-archive'
 
       # Check the Magic type:  I suspect this will be fragile
       ft = FileMagic.fm(:symlink).file(@path)
-      fail ArgumentError, "The file '#{@path}' doesn't seem to be an APK (#{ft})" \
-        unless ft == 'Java archive data (JAR)'     or \
-               ft == 'Microsoft OOXML'             or \
-               ft.start_with? 'Zip archive data'   or \
-               ft.start_with? 'Java Jar file data'
+      fail ArgumentError, \
+           "The file '#{ @path }' doesn't seem to be an APK (#{ ft })" \
+        unless ft == 'Java archive data (JAR)'     || \
+               ft == 'Microsoft OOXML'             || \
+               (ft.start_with? 'Zip archive data') || \
+               (ft.start_with? 'Java Jar file data')
     end
 
     ##
@@ -83,13 +84,13 @@ module Skb
     def add(path, log)
       target = File.join path, @id
       if already_exists target
-        log.warn "APK '#{@path}' already exists... skipping"
+        log.warn "APK '#{ @path }' already exists... skipping"
       else
         target = File.expand_path target
 
         FileUtils.mkdir target, mode: 0700
-        
-        if @options[:symlink] 
+
+        if @options[:symlink]
           FileUtils.ln_s @path, target
         else
           # TODO: Drop permissions and set correct UID
@@ -108,19 +109,19 @@ module Skb
       return false unless File.directory? apk_dir
 
       # Check if its the same apk
-      apks = Dir["#{apk_dir}/*.apk"]
+      apks = Dir["#{ apk_dir }/*.apk"]
 
       fail SecurityError,
-           "There is already an APK in the SKB with id '#{@id}'," \
+           "There is already an APK in the SKB with id '#{ @id }', " \
            'but it seems odd. Please check SKB consistency.' \
         if apks.length != 1
 
       fail NameError,
-           "The apk '#{apk}' collides with an existing" \
-           "entry in the SKB with id: #{@id}" \
+           "The apk '#{ apk }' collides with an existing" \
+           "entry in the SKB with id: #{ @id }" \
         unless same_as apks.first
 
-      return true
+      # return true
     end
 
     private
@@ -128,21 +129,20 @@ module Skb
     def fetch_badging(path)
       begin
         output = Timeout::timeout(30) do
-          Open3::popen2("aapt dump badging '#{path}'") do |_in, out, thread|
+          Open3::popen2("aapt dump badging '#{ path }'") do |_in, out, thread|
             status = thread.value
             until status.success? do end
             return out.read
           end
         end
       rescue Timeout::Error
-        fail Timeout::Error, 'Timed out attempting to read badging info ' \
-                             "from '#{path}'"
+        raise Timeout::Error, 'Timed out attempting to read badging info ' \
+                              "from '#{ path }'"
       end
 
-      return output
+      output
     end
   end
-
 
   ##
   # An entry in the SKB
@@ -151,25 +151,24 @@ module Skb
     def initialize(id)
       @id = id
       @app = APK.new Dir[File.join(id, '*.apk')].first
-      @meta = Dir[File.join(id, 'meta', '*')].map {|m| File.basename m}
-      
-      @rs = Dir[File.join(id, 'results', '*')].map {|r| File.basename r}
-      puts "@ #{@rs}"
+      @meta = Dir[File.join(id, 'meta', '*')].map { |m| File.basename m }
+
+      @rs = Dir[File.join(id, 'results', '*')].map { |r| File.basename r }
       @rvs = []
       @rs.each do |r|
-        fetch_result_versions(r).each {|rv| @rvs << rv}
+        fetch_result_versions(r).each { |rv| @rvs << rv }
       end
       @result = []
       @rvs.each do |rv|
-        r,v = rv
-        fetch_result_version_configs(r,v).each {|rvc| @result << rvc} 
+        r, v = rv
+        fetch_result_version_configs(r, v).each { |rvc| @result << rvc }
       end
     end
 
     ##
     # Fetch the metadata
     def fetch_meta(m)
-      fail IndexError, "No metadata about '#{m}'" \
+      fail IndexError, "No metadata about '#{ m }'" \
         unless @meta.include? m
 
       File.open(File.join(@id, 'meta', m), 'r') { |f| return f.read }
@@ -178,29 +177,30 @@ module Skb
     ##
     # Fetch the result
     def fetch_result(rvc)
-      r,v,c = rvc
-      fail IndexError, "No result for '#{r} v#{v} (#{c})'" \
+      r, v, c = rvc
+      fail IndexError, "No result for '#{ r } v#{ v } (#{ c })'" \
         unless @result.include? rvc
 
-      File.open(File.join(@id, 'results', r, v, c, 'result'), 'r') { |f| return f.read }
+      File.open(File.join(@id, 'results', r, v, c, 'result'), 'r') \
+        { |f| return f.read }
     end
 
     private
 
     def fetch_result_versions(r)
-      fail IndexError, "No result for '#{r}'" \
+      fail IndexError, "No result for '#{ r }'" \
         unless @rs.include? r
 
-      Dir[File.join(@id, 'results', r, '*')].map {|v| [r, File.basename(v)]}  
+      Dir[File.join(@id, 'results', r, '*')] \
+        .map { |v| [r, File.basename(v)] }
     end
 
-    def fetch_result_version_configs(r,v)
-      fail IndexError "No result for '#{r} v#{v}'" \
-        unless @rvs.include? [r,v]
+    def fetch_result_version_configs(r, v)
+      fail IndexError "No result for '#{ r } v#{ v }'" \
+        unless @rvs.include? [r, v]
 
-      Dir[File.join(@id, 'results', r, v, '*')].map {|c| [r,v,File.basename(c)]}
+      Dir[File.join(@id, 'results', r, v, '*')] \
+        .map { |c| [r, v, File.basename(c)] }
     end
-
   end
 end
-
