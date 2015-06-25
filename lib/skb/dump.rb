@@ -32,14 +32,14 @@ module Skb
       end
     end
 
-    def skb_says(app, has, fact, who: 'Skb')
-      %|#{who} says "#{app}" #{has}("#{fact}");\n|
+    def skb_says(app, has, fact, who: 'skb')
+      %|"#{who}" says "#{app}" #{has}("#{fact}").\n|
     end
 
     private
 
     def meta_Name(entity, data)
-      skb_says(entity.app.id, 'Name', data.strip)
+      skb_says(entity.app.id, 'hasName', data.strip)
     end
 
     def meta_Permissions(entity, data)
@@ -47,18 +47,18 @@ module Skb
       data.each_line do |line|
         if line.start_with? 'uses-permission:'
           perm = line.split(':')[1].strip
-          output << skb_says(entity.app.id, 'Permission', perm)
+          output << skb_says(entity.app.id, 'hasPermission', perm)
         end
       end
       output
     end
 
     def meta_PlayStoreReviewScore(entity, data)
-      skb_says(entity.app.id, 'ReviewScore', data.strip, who: 'PlayStore')
+      skb_says(entity.app.id, 'hasReviewScore', data.strip, who: 'PlayStore')
     end
 
     def meta_PlayStoreCategory(entity, data)
-      skb_says(entity.app.id, 'Category', data.strip, who: 'PlayStore')
+      skb_says(entity.app.id, 'hasCategory', data.strip, who: 'PlayStore')
     end
 
     # This isn't a great dumping function.
@@ -72,7 +72,7 @@ module Skb
           key = fields[0].strip.gsub ' ', '_'
           value = fields[1].strip.gsub '"', ''
 
-          out << skb_says(entity.app.id, "Certificate_#{key}", value)
+          out << skb_says(entity.app.id, "hasCertificate#{key}", value)
         end
       end
       out
